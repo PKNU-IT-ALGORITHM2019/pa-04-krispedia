@@ -471,7 +471,7 @@ void runSort(int i, int j) {
 
 }
 void runningTest(){
-    for(int i=0; i<2; i++) {
+    for(int i=0; i<T; i++) {
        for(int j=0; j<2; j++){
            clock_t start, end; 
            if(j==0){

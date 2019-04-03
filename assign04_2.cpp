@@ -2,6 +2,7 @@
 #include<fstream>
 #include<vector>
 #include<string>
+#include<map>
 
 using namespace std;
 
@@ -10,8 +11,10 @@ vector<string> ip;
 vector<string> dataTime;
 vector<string> url;
 vector<string> status;
+map<string, string> timeKeyMap;
+map<string, string> ipKeyMap;
 
-int delimLoc[3];
+vector<int> delimLoc;
 
 void readFile(string fileName){
     string line;
@@ -30,31 +33,65 @@ void printData(vector<string> input) {
         cout<<*it<<'\n';
 }
 void getDelimLoc(string csvDataLow){
-    delimLoc[0] = csvDataLow.find(",");
-    //cout<<delimLoc[0]<<'\n';
-    delimLoc[1] = csvDataLow.find(",",delimLoc[0]+1);
-    //cout<<delimLoc[1]<<'\n';
-    delimLoc[2] = csvDataLow.find(",",delimLoc[1]+1);
-    //cout<<delimLoc[2]<<'\n';
-}
-void splitData(){
-    for(auto it=csvData.begin(); it!=csvData.end(); ++it){
-        getDelimLoc(*it);
-        ip.push_back(it->substr(0, delimLoc[0]));
-        dataTime.push_back(it->substr(delimLoc[0]+2, delimLoc[1]-delimLoc[0]-2));
-        url.push_back(it->substr(delimLoc[1]+1, delimLoc[2]-delimLoc[1]-1));
-        status.push_back(it->substr(delimLoc[2]+1));
+    delimLoc.clear();
+    int count=0;
+    if(csvDataLow.find(",") == -1){
+        cout<<"no ',' in string"<<'\n';
+        return;
     }
+    delimLoc.push_back(csvDataLow.find(","));
+    count++;
+    while(csvDataLow.find(",",delimLoc.at(count-1)+1)!=-1){
+        delimLoc.push_back(csvDataLow.find(",",delimLoc.at(count-1)+1));
+        count++;
+    }
+}
+void splitData(vector<string> input){
+    for(auto it=input.begin(); it!=input.end(); ++it){
+        getDelimLoc(*it);
+        ip.push_back(it->substr(0, delimLoc.at(0)));
+        dataTime.push_back(it->substr(delimLoc.at(0)+2, delimLoc.at(1)-delimLoc.at(0)-2));
+        url.push_back(it->substr(delimLoc.at(1)+1, delimLoc.at(2)-delimLoc.at(1)-1));
+        status.push_back(it->substr(delimLoc.at(2)+1));
+    }
+    cout<<"split data done!"<<'\n';
 }
 void print(){
     for(int i=0; i<csvData.size(); i++){
         cout<<dataTime.at(i)<<'\n';
         cout<<"\tIP: "<<ip.at(i)<<'\n';
         cout<<"\tURL: "<<url.at(i)<<'\n';
-        cout<<"\tStatsu: "<<status.at(i)<<'\n';
+        cout<<"\tStatus: "<<status.at(i)<<'\n';
     }
 }
-void commandLine() {
+void mapPrint(map<string, string> input){
+    for(auto p : input)
+        cout<<p.first<<' '<<p.second<<'\n';
+}
+void makeTimeKeyMap(vector<string> timeIn, vector<string> ipIn, vector<string> urlIn, vector<string> statusIn){
+    
+    for(int i=0; i<timeIn.size(); i++){
+        string combineString ="";
+        combineString.append(ipIn.at(i));
+        combineString.append(",");
+        combineString.append(urlIn.at(i));
+        combineString.append(",");
+        combineString.append(statusIn.at(i));
+        cout<<combineString<<'\n';
+        timeKeyMap[timeIn.at(i)] = combineString;
+    }
+    mapPrint(timeKeyMap);
+}
+
+void soryByTime(){
+    makeTimeKeyMap(dataTime, ip, url, status);
+    sort(dataTime.begin(), dataTime.end());
+
+}
+void sortByIp(){
+
+}
+void commandLine(){
     string input, command, argument;
 
     ios_base::sync_with_stdio(false);
@@ -67,7 +104,7 @@ void commandLine() {
             cin>>argument;
             readFile(argument);
             //printData(csvData);
-            splitData();
+            splitData(csvData);
             //printData(ip);
             //printData(dataTime);
             //printData(url);
@@ -75,7 +112,18 @@ void commandLine() {
         }
         else if(command == "sort"){
             cout<<"sort"<<'\n';
-     
+            cin>>argument;
+            if(argument == "-t"){
+                cout<<"sortByTime"<<'\n';
+                makeTimeKeyMap(dataTime, ip, url, status);
+                //sortByTime();
+            }
+            else if(argument == "-ip"){
+                cout<<"soryByIp"<<'\n';
+                //sortByIp();
+            }
+            else
+                break;
         }
         else if(command == "print"){
             cout<<"print"<<'\n';
@@ -91,25 +139,6 @@ void commandLine() {
 }
 
 int main(void) {
-    // string fileName = "webLog.csv";
-    // readFile(fileName);
-    // //printData();
-    // cout<<'\n'<<csvData.at(0)<<'\n';
-    // int index1 = csvData.at(0).find(",");
-    // cout<<index1<<'\n';
-    // int index2 = csvData.at(0).find(",",index1+1);
-    // cout<<index2<<'\n';
-    // int index3 = csvData.at(0).find(",", index2+1);
-    // cout<<index3<<'\n';
-    
-    // string ip = csvData.at(0).substr(0,index1);
-    // cout<<ip<<'\n';
-    // string time = csvData.at(0).substr(index1+1, index2-index1-1);
-    // cout<<time<<'\n';
-    // string url = csvData.at(0).substr(index2+1, index3-index2-1);
-    // cout<<url<<'\n';
-    // string status = csvData.at(0).substr(index3+1);
-    // cout<<status<<'\n';
 
     commandLine();
 

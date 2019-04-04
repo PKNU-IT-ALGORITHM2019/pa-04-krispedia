@@ -1,24 +1,24 @@
-#include<iostream>
-#include<vector>
-#include<cstdlib>
-#include<ctime>
-#define T 3
+#include<iostream>    // 입출력
+#include<vector>      // 데이터 저장
+#include<cstdlib>     // 
+#include<ctime>       // 시간 측정
+#define T 3           // test case 3
 
 using namespace std;
 
-int N[3] = {1000, 10000, 100000};
-double runningTime[9][6] = {0.0};
-vector<double> randomTime(10,0);
-vector<double> randomTimeOrigin(10,0);
-vector<int> data;
-vector<int> dataOrigin;
-int heapSize;
+int N[3] = {1000, 10000, 100000};      // test case 크기
+double runningTime[9][6] = {0.0};      // 전체 시간 저장 
+vector<double> randomTime(10,0);       // randomdata 10번 test time 저장
+vector<double> randomTimeOrigin(10,0); // randomdata 10번 test time 저장용 origin 공간
+vector<int> data;                      // test 시 사용되는 데이터(dataOrigin 복사본)
+vector<int> dataOrigin;                // 생성된 데이터 
+int heapSize;   // heap 크기 저장
 
 void merge(vector<int> data, int p, int q, int r);
 int partitionLastPivot(int left, int right);
 int partitionMedianPivot(int left, int right);
 int partitionRandomPivot(int left, int right);
-
+// 결과물 출력
 void printResult() {
 
     cout<<"            \tRandom1000";
@@ -61,6 +61,7 @@ void printResult() {
         cout<<'\n';
     }
 }
+// vector 안 데이터 swap (index 사용)
 void swap(int index1, int index2){
     int temp = data.at(index1);
     data.at(index1) = data.at(index2);
@@ -154,6 +155,7 @@ void merge(vector<int> arr, int left, int mid, int right){
         cout<<'\n';
 */
 }
+// 배열 마지막 데이터 피봇
 void quickSortLast(int left, int right){
     if(left<right){
         int pivot = partitionLastPivot(left, right);
@@ -178,6 +180,7 @@ int partitionLastPivot(int left, int right){
 
     return i+1;
 }
+// first, middle, last 중 가운데 값 피봇 
 void quickSortMedian(int left, int right){
     if(left<right){
         int pivot = partitionMedianPivot(left, right);
@@ -186,6 +189,7 @@ void quickSortMedian(int left, int right){
     }
     
 }
+// 가운데 값 찾기
 int getMedian(){
     int mediumIndex = data.size()/2;
     int lastIndex = data.size()-1;
@@ -217,6 +221,7 @@ int partitionMedianPivot(int left, int right){
 
     return i+1;
 }
+// 랜덤 피봇
 void quickSortRandom(int left, int right){
     if(left<right){
         int pivot = partitionRandomPivot(left, right);
@@ -247,7 +252,7 @@ int partitionRandomPivot(int left, int right){
     return i+1;
 }
 /*
-// iterative
+// method 1 - iterative
 void maxHeapify(vector<int> arr, int i){
     int l = 2*i+1;
     int r = 2*i+2;
@@ -264,7 +269,7 @@ void maxHeapify(vector<int> arr, int i){
     }
 }
 */
-// recursive
+// method 2 - recursive
 void maxHeapify(vector<int> arr, int i){
     int l = 2*i+1;
     int r = 2*i+2;
@@ -283,7 +288,6 @@ void maxHeapify(vector<int> arr, int i){
     swap(i, larger);
     maxHeapify(arr, larger);
 }
-
 void buildMaxHeap(vector<int> arr) {
     heapSize = arr.size()-1;
     for(int i=arr.size()/2; i>=0; i--){
@@ -298,7 +302,7 @@ void heapSort(vector<int> arr){
         maxHeapify(arr, 0);
     }
 }
-
+// 랜덤 데이터 생성
 void generateRandomData(int N){
     srand((unsigned int) time(NULL));
     dataOrigin.clear();
@@ -308,17 +312,20 @@ void generateRandomData(int N){
         dataOrigin.push_back(number);
     }
 }
+// 역순 데이터 생성
 void generateReversedData(int N){
     dataOrigin.clear();
     for(int i=0; i<N; i++){
         dataOrigin.push_back(N-i);
     }
 }
+// test에 사용될 데이터 출력
 void printData(){
     for(auto it=data.begin(); it!=data.end(); ++it)
         cout<<*it<<" ";
     cout<<'\n';    
 }
+// 시간 결과 저장
 void saveRunningTime(int row, int col, double time){
     runningTime[row][col] = time;
 }
@@ -470,6 +477,7 @@ void runSort(int i, int j) {
     saveRunningTime(8,(i+1)*(j+1)-1,resultTime);
 
 }
+// 3번의 다른 갯수 데이터 & random/reversed 데이터
 void runningTest(){
     for(int i=0; i<T; i++) {
        for(int j=0; j<2; j++){
